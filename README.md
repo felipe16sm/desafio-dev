@@ -1,85 +1,538 @@
-# Desafio programação - para vaga desenvolvedor
+# Desafio-dev
 
-Por favor leiam este documento do começo ao fim, com muita atenção.
-O intuito deste teste é avaliar seus conhecimentos técnicos em programação.
-O teste consiste em parsear [este arquivo de texto(CNAB)](https://github.com/ByCodersTec/desafio-ruby-on-rails/blob/master/CNAB.txt) e salvar suas informações(transações financeiras) em uma base de dados a critério do candidato.
-Este desafio deve ser feito por você em sua casa. Gaste o tempo que você quiser, porém normalmente você não deve precisar de mais do que algumas horas.
+Esta aplicação foi implementada em duas partes: um frontend feito em React que está implementado no seguinte diretório do projeto
 
-# Instruções de entrega do desafio
+```
+frontend-react-desafio-dev
+```
 
-1. Primeiro, faça um fork deste projeto para sua conta no Github (crie uma se você não possuir).
-2. Em seguida, implemente o projeto tal qual descrito abaixo, em seu clone local.
-3. Por fim, envie via email o projeto ou o fork/link do projeto para seu contato Bycoders_ com cópia para rh@bycoders.com.br.
+Também há um backend implementado em Django que está no seguinte diretório do projeto
 
-# Descrição do projeto
+```
+backend-django-desafio-dev
+```
 
-Você recebeu um arquivo CNAB com os dados das movimentações finanaceira de várias lojas.
-Precisamos criar uma maneira para que estes dados sejam importados para um banco de dados.
+# Instalação e utilização do backend
 
-Sua tarefa é criar uma interface web que aceite upload do [arquivo CNAB](https://github.com/ByCodersTec/desafio-ruby-on-rails/blob/master/CNAB.txt), normalize os dados e armazene-os em um banco de dados relacional e exiba essas informações em tela.
+O backend está Dockerizado com as migrations e banco de dados atualizados. Para instalar o backend basta executar a partir da <b>raíz</b> do diretório do projeto o comando
 
-**Sua aplicação web DEVE:**
+```
+sudo docker-compose up
+```
 
-1. Ter uma tela (via um formulário) para fazer o upload do arquivo(pontos extras se não usar um popular CSS Framework )
-2. Interpretar ("parsear") o arquivo recebido, normalizar os dados, e salvar corretamente a informação em um banco de dados relacional, **se atente as documentações** que estão logo abaixo.
-3. Exibir uma lista das operações importadas por lojas, e nesta lista deve conter um totalizador do saldo em conta
-4. Ser escrita na sua linguagem de programação de preferência
-5. Ser simples de configurar e rodar, funcionando em ambiente compatível com Unix (Linux ou Mac OS X). Ela deve utilizar apenas linguagens e bibliotecas livres ou gratuitas.
-6. Git com commits atomicos e bem descritos
-7. PostgreSQL, MySQL ou SQL Server
-8. Ter testes automatizados
-9. Docker compose (Pontos extras se utilizar)
-10. Readme file descrevendo bem o projeto e seu setup
-11. Incluir informação descrevendo como consumir o endpoint da API
+Com isso todas as dependencias serão instaladas e o backend será executado automaticamente
 
-**Sua aplicação web não precisa:**
+<h2>Documentação da API do backend</h2>
 
-1. Lidar com autenticação ou autorização (pontos extras se ela fizer, mais pontos extras se a autenticação for feita via OAuth).
-2. Ser escrita usando algum framework específico (mas não há nada errado em usá-los também, use o que achar melhor).
-3. Documentação da api.(Será um diferencial e pontos extras se fizer)
+<h4>Gravação de todas as transações a partir de um arquivo (POST /api/stores/transactions/)</h4>
 
-# Documentação do CNAB
+Através dessa rota, enviamos um arquivo de texto com as informações de diversas lojas.
 
-| Descrição do campo  | Inicio | Fim | Tamanho | Comentário
-| ------------- | ------------- | -----| ---- | ------
-| Tipo  | 1  | 1 | 1 | Tipo da transação
-| Data  | 2  | 9 | 8 | Data da ocorrência
-| Valor | 10 | 19 | 10 | Valor da movimentação. *Obs.* O valor encontrado no arquivo precisa ser divido por cem(valor / 100.00) para normalizá-lo.
-| CPF | 20 | 30 | 11 | CPF do beneficiário
-| Cartão | 31 | 42 | 12 | Cartão utilizado na transação 
-| Hora  | 43 | 48 | 6 | Hora da ocorrência atendendo ao fuso de UTC-3
-| Dono da loja | 49 | 62 | 14 | Nome do representante da loja
-| Nome loja | 63 | 81 | 19 | Nome da loja
+```sh
+POST /api/stores/transactions/
 
-# Documentação sobre os tipos das transações
+REQUEST
 
-| Tipo | Descrição | Natureza | Sinal |
-| ---- | -------- | --------- | ----- |
-| 1 | Débito | Entrada | + |
-| 2 | Boleto | Saída | - |
-| 3 | Financiamento | Saída | - |
-| 4 | Crédito | Entrada | + |
-| 5 | Recebimento Empréstimo | Entrada | + |
-| 6 | Vendas | Entrada | + |
-| 7 | Recebimento TED | Entrada | + |
-| 8 | Recebimento DOC | Entrada | + |
-| 9 | Aluguel | Saída | - |
+file text/plain CNAB.txt
 
-# Avaliação
+```
 
-Seu projeto será avaliado de acordo com os seguintes critérios.
+Será retornada um resposta de status 201 (CREATED) com as informações de todas as transações. Por exemplo
 
-1. Sua aplicação preenche os requerimentos básicos?
-2. Você documentou a maneira de configurar o ambiente e rodar sua aplicação?
-3. Você seguiu as instruções de envio do desafio?
-4. Qualidade e cobertura dos testes unitários.
+```sh
+POST /api/stores/transactions/
 
-Adicionalmente, tentaremos verificar a sua familiarização com as bibliotecas padrões (standard libs), bem como sua experiência com programação orientada a objetos a partir da estrutura de seu projeto.
+RESPONSE 201 (CREATED)
 
-# Referência
+[
+  {
+    "id": 1,
+    "nome_loja": "BAR DO JOÃO",
+    "dono_loja": "JOÃO MACEDO",
+    "transacoes": [
+      {
+        "tipo": 3,
+        "data": "20190301",
+        "valor": 142.0,
+        "cpf": "09620676017",
+        "cartao": "4753****3153",
+        "hora": "153453"
+      },
+      {
+        "tipo": 2,
+        "data": "20190301",
+        "valor": 112.0,
+        "cpf": "09620676017",
+        "cartao": "3648****0099",
+        "hora": "234234"
+      },
+      {
+        "tipo": 1,
+        "data": "20190301",
+        "valor": 152.0,
+        "cpf": "09620676017",
+        "cartao": "1234****7890",
+        "hora": "233000"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "nome_loja": "LOJA DO Ó - MATRIZ",
+    "dono_loja": "MARIA JOSEFINA",
+    "transacoes": [
+      {
+        "tipo": 5,
+        "data": "20190301",
+        "valor": 132.0,
+        "cpf": "55641815063",
+        "cartao": "3123****7687",
+        "hora": "145607"
+      },
+      {
+        "tipo": 1,
+        "data": "20190301",
+        "valor": 200.0,
+        "cpf": "55641815063",
+        "cartao": "1234****3324",
+        "hora": "090002"
+      },
+      {
+        "tipo": 9,
+        "data": "20190301",
+        "valor": 102.0,
+        "cpf": "55641815063",
+        "cartao": "6228****9090",
+        "hora": "000000"
+      }
+    ]
+  }
+  ...
+]
 
-Este desafio foi baseado neste outro desafio: https://github.com/lschallenges/data-engineering
+```
 
----
+<h4>Criar um loja com transações cadastradas (POST /api/stores/)</h4>
 
-Boa sorte!
+Nesse endpoint podemos criar uma loja já com transações cadastradas como é possível ver no exemplo a seguir.
+
+```sh
+
+POST /api/stores/
+
+REQUEST
+
+{
+  "nome_loja": "BAR DO JOÃO",
+  "dono_loja": "JOÃO MACEDO",
+  "transacoes": [
+    {
+      "tipo": 3,
+      "data": "20190301",
+      "valor": 142.0,
+      "cpf": "09620676017",
+      "cartao": "4753****3153",
+      "hora": "153453"
+    },
+    {
+      "tipo": 2,
+      "data": "20190301",
+      "valor": 112.0,
+      "cpf": "09620676017",
+      "cartao": "3648****0099",
+      "hora": "234234"
+    },
+    {
+      "tipo": 1,
+      "data": "20190301",
+      "valor": 152.0,
+      "cpf": "09620676017",
+      "cartao": "1234****7890",
+      "hora": "233000"
+    }
+  ]
+}
+
+```
+
+Se tudo ocorrer bem teremos uma resposta com status 201 (CREATED) retornando no corpo os dados da loja com as transações.
+
+```sh
+
+POST /api/stores/
+
+RESPONSE 201
+
+{
+  "nome_loja": "BAR DO JOÃO",
+  "dono_loja": "JOÃO MACEDO",
+  "transacoes": [
+    {
+      "tipo": 3,
+      "data": "20190301",
+      "valor": 142.0,
+      "cpf": "09620676017",
+      "cartao": "4753****3153",
+      "hora": "153453"
+    },
+    {
+      "tipo": 2,
+      "data": "20190301",
+      "valor": 112.0,
+      "cpf": "09620676017",
+      "cartao": "3648****0099",
+      "hora": "234234"
+    },
+    {
+      "tipo": 1,
+      "data": "20190301",
+      "valor": 152.0,
+      "cpf": "09620676017",
+      "cartao": "1234****7890",
+      "hora": "233000"
+    }
+  ]
+}
+
+```
+
+Caso já exista uma loja com esse nome então é retornada uma resposta com status 409 (CONFLICT) com a mensagem
+
+```sh
+
+POST /api/stores/
+
+RESPONSE 409
+
+{
+  "erro": "Essa loja já existe"
+}
+
+```
+
+Caso algum campo esteja faltando será retornado status 400 (BAD REQUEST)
+
+```sh
+
+POST /api/stores/
+
+RESPONSE 404
+
+{
+  "dono_loja": [
+    "This field is required."
+  ]
+}
+
+```
+
+<h4>Exibir todas as lojas cadastradas no sistema (GET /api/stores/)</h4>
+
+A requisição desse endpoint retorna todas as lojas cadastradas no sistema e retorna status 200 (OK). A seguir temos um exemplo de resposta.
+
+```sh
+GET /api/stores/
+
+RESPONSE 200
+
+[
+  {
+    "id": 1,
+    "nome_loja": "BAR DO JOÃO",
+    "dono_loja": "JOÃO MACEDO",
+    "transacoes": [
+      {
+        "tipo": 3,
+        "data": "20190301",
+        "valor": 142.0,
+        "cpf": "09620676017",
+        "cartao": "4753****3153",
+        "hora": "153453"
+      },
+      {
+        "tipo": 2,
+        "data": "20190301",
+        "valor": 112.0,
+        "cpf": "09620676017",
+        "cartao": "3648****0099",
+        "hora": "234234"
+      },
+      {
+        "tipo": 1,
+        "data": "20190301",
+        "valor": 152.0,
+        "cpf": "09620676017",
+        "cartao": "1234****7890",
+        "hora": "233000"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "nome_loja": "LOJA DO Ó - MATRIZ",
+    "dono_loja": "MARIA JOSEFINA",
+    "transacoes": [
+      {
+        "tipo": 5,
+        "data": "20190301",
+        "valor": 132.0,
+        "cpf": "55641815063",
+        "cartao": "3123****7687",
+        "hora": "145607"
+      },
+      {
+        "tipo": 1,
+        "data": "20190301",
+        "valor": 200.0,
+        "cpf": "55641815063",
+        "cartao": "1234****3324",
+        "hora": "090002"
+      },
+      {
+        "tipo": 9,
+        "data": "20190301",
+        "valor": 102.0,
+        "cpf": "55641815063",
+        "cartao": "6228****9090",
+        "hora": "000000"
+      }
+    ]
+  }
+  ...
+]
+```
+
+<h4>Adicionar uma transação a uma loja (POST /api/stores/id/transactions/)</h4>
+
+Esse endpoint permite adicionar transações a lojas que já existem. A seguir temos um exemplo de requisição
+
+```sh
+POST /api/stores/1/transactions/
+
+REQUEST
+
+{
+"transacoes": [
+      {
+        "tipo": 4,
+        "data": "20210301",
+        "valor": 100.5,
+        "cpf": "09620676017",
+        "cartao": "1234****5678",
+        "hora": "201553"
+      },
+      {
+        "tipo": 5,
+        "data": "20210301",
+        "valor": 75.0,
+        "cpf": "09620676017",
+        "cartao": "5678****1234",
+        "hora": "114234"
+      }
+    ]
+}
+```
+
+Como resposta temos os dados da loja com as com todas as transações adicionadas e as que já existiam. O status da resposta é 201 (CREATED)
+
+```sh
+POST /api/stores/1/transactions/
+
+RESPONSE 201
+
+{
+  "id": 1,
+  "nome_loja": "BAR DO JOÃO",
+  "dono_loja": "JOÃO MACEDO",
+  "transacoes": [
+    {
+      "tipo": 3,
+      "data": "20190301",
+      "valor": 142.0,
+      "cpf": "09620676017",
+      "cartao": "4753****3153",
+      "hora": "153453"
+    },
+    {
+      "tipo": 2,
+      "data": "20190301",
+      "valor": 112.0,
+      "cpf": "09620676017",
+      "cartao": "3648****0099",
+      "hora": "234234"
+    },
+    {
+      "tipo": 1,
+      "data": "20190301",
+      "valor": 152.0,
+      "cpf": "09620676017",
+      "cartao": "1234****7890",
+      "hora": "233000"
+    },
+    {
+      "tipo": 4,
+      "data": "20210301",
+      "valor": 100.5,
+      "cpf": "09620676017",
+      "cartao": "1234****5678",
+      "hora": "201553"
+    },
+    {
+      "tipo": 5,
+      "data": "20210301",
+      "valor": 75.0,
+      "cpf": "09620676017",
+      "cartao": "5678****1234",
+      "hora": "114234"
+    }
+  ]
+}
+
+```
+
+Caso a loja não exista teremos uma resposta com status 404 (NOT FOUND) com o seguinte corpo
+
+```sh
+POST /api/stores/1/transactions/
+
+RESPONSE 404
+
+{
+  "erro": "Não há loja com essa id"
+}
+```
+
+<h4>Exibir as transações de uma loja (GET /api/stores/id/transactions/)</h4>
+
+Ao fazer uma requisição GET nesse endpoint, obtemos uma resposta de status 200 (OK) e é retornado no corpo os dados da loja selecionada e as transações como podemos ver a seguir
+
+```sh
+GET /api/stores/1/transactions/
+
+RESPONSE 200
+{
+  "id": 1,
+  "nome_loja": "BAR DO JOÃO",
+  "dono_loja": "JOÃO MACEDO",
+  "transacoes": [
+    {
+      "tipo": 3,
+      "data": "20190301",
+      "valor": 142.0,
+      "cpf": "09620676017",
+      "cartao": "4753****3153",
+      "hora": "153453"
+    },
+    {
+      "tipo": 2,
+      "data": "20190301",
+      "valor": 112.0,
+      "cpf": "09620676017",
+      "cartao": "3648****0099",
+      "hora": "234234"
+    },
+    {
+      "tipo": 1,
+      "data": "20190301",
+      "valor": 152.0,
+      "cpf": "09620676017",
+      "cartao": "1234****7890",
+      "hora": "233000"
+    }
+  ]
+}
+
+```
+
+Caso não exista loja com o id selecionado então é retornado uma resposta com status 404 (NOT FOUND)
+
+```sh
+GET /api/stores/1/transactions/
+
+RESPONSE 404
+
+{
+  "erro": "Não há loja com essa id"
+}
+```
+
+# Instalação e utilização do frontend
+
+Primeiramente, para utilizar o frontend em React devemos instalar o npm e o nodeJS. Uma boa forma de instalar o npm e o nodeJS é instalando o nvm que permite instalar várias versões de ambos. Para isso basta seguir as instrução em
+
+```sh
+https://github.com/nvm-sh/nvm
+
+```
+
+Após isso, podemos instalar o gerenciador de pacote yarn que é utilizado nesse projeto. Para isso, após instalado o npm, basta rodar no terminal o comando
+
+```sh
+npm install --global yarn
+
+```
+
+Em seguida, podemos rodar o projeto indo pelo terminal até o diretório <b>frontend-react-desafio-dev</b> do projeto
+
+Então, no terminal, para instalar todas as dependências do projeto frontend rodamos o comando
+
+```
+yarn
+```
+
+Depois que todas as dependências forem instaladas, basta digitar no terminal o comando para rodar a aplicação
+
+```
+yarn start
+```
+
+# Explorando a Aplicação Frontend
+
+Ao entrar na página inicial da aplicação vemos um botão para selecionar o arquivo com as transações e outro para registrar as transações, como podemos ver a seguir
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/felipe16sm/desafio-dev/master/readme-images/Screenshot-from-2021-08-03-05-03-57.png" width="100%" title="Tela Inicial">
+</p>
+
+Após selecionar o arquivo com as transações, o nome do arquivo é mostrado
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/felipe16sm/desafio-dev/master/readme-images/Screenshot-from-2021-08-03-05-04-18.png" width="100%" title="Arquivo Selecionado">
+</p>
+
+Depois de clicar em registrar transações, somos redirecionados para a rota de lojas, onde são mostradas todas as lojas
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/felipe16sm/desafio-dev/master/readme-images/Screenshot-from-2021-08-03-05-04-32.png" width="100%" title="Lojas">
+</p>
+
+Então podemos clicar em uma loja para sermos redirecionados para a visualização das transações da
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/felipe16sm/desafio-dev/master/readme-images/Screenshot-from-2021-08-03-05-04-47.png" width="100%" title="Transações">
+</p>
+
+# Comandos úteis de docker
+
+```
+//Lista todos os containers ativos
+
+sudo docker ps
+
+-------------
+
+//Entra no shell do container
+
+sudo docker exec -it idcontainer /bin/bash
+
+-------------
+
+```
+
+# Testes automatizados
+
+```
+//Roda testes automatizados e grava resultado em report.txt
+
+TEST=TEST python manage.py test -v 2 &> report.txt
+```
