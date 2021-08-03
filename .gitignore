@@ -1,0 +1,28 @@
+backend-django-desafio-dev/venv
+backend-django-desafio-dev/db.sqlite3
+**/__pycache__/
+backend-django-desafio-dev/*.pyc
+
+
+
+# dependencies
+frontend-react-desafio-dev/node_modules
+frontend-react-desafio-dev/.pnp
+frontend-react-desafio-dev/.pnp.js
+
+# testing
+frontend-react-desafio-dev/coverage
+
+# production
+frontend-react-desafio-dev/build
+
+# misc
+frontend-react-desafio-dev/.DS_Store
+frontend-react-desafio-dev/.env.local
+frontend-react-desafio-dev/.env.development.local
+frontend-react-desafio-dev/.env.test.local
+frontend-react-desafio-dev/.env.production.local
+
+frontend-react-desafio-dev/npm-debug.log*
+frontend-react-desafio-dev/yarn-debug.log*
+frontend-react-desafio-dev/yarn-error.log*
